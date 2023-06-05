@@ -1,3 +1,4 @@
+### import modules ###
 import pandas as pd
 import mysql.connector
 import dash
@@ -5,6 +6,7 @@ import plotly.graph_objs as go
 from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output
 
+### Assigning team colors ###
 STAT_COLOR = {
     'Manchester City': '#6CABDD', 'Liverpool': '#C8102E', 'Chelsea': '#034694', 'Manchester United': '#DA291C',
     'Tottenham Hotspur': '#132257', 'Arsenal': '#EF0107', 'Leicester City': '#003090', 'Everton': '#003399',
@@ -23,6 +25,7 @@ STAT_COLOR = {
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 
+### Connecting to Mysql database  ###
 mydb = mysql.connector.connect(
     host="***",
     user="***",
@@ -30,17 +33,25 @@ mydb = mysql.connector.connect(
     database="***"
 )
 
+### Query for the team results since 2000 and removing (C), (R)###
 query = "SELECT * FROM 2000_now ORDER BY Year ASC"
 df = pd.read_sql(query, mydb)
 df['Team'] = df['Team'].str.replace('\(C\)$|\(R\)$', '', regex=True).str.strip()
 
+### Query for the Topscorer stats in a different Table ###
 query2 = "SELECT * FROM topscorer ORDER BY Year ASC"
 df2 = pd.read_sql(query2, mydb)
 
+### Removing duplicates ###
 selected_year = df.Year.unique()
+
+### Possible stats to show which are in the dataframe ###
 available_stats = ['Pos', 'Wins', 'Draw', 'Loss', 'Goals_for', 'Goals_against', 'Goal_differential', 'Points']
+
+### Checks for all possible teams in the dataframe and removes duplicates ###
 team_options = [{'label': team, 'value': team} for team in sorted(df.Team.unique())]
 
+###Layout of the main page logo, header with the title and for links to click and navigate to###
 start_layout = html.Div(
     [
         html.Img(
@@ -88,7 +99,7 @@ start_layout = html.Div(
     style={'backgroundImage': 'linear-gradient(to bottom, #0070B5, #DBFCFF)', 'padding': '300px'}
 )
 
-# Callback to handle page navigation
+###Callback to navigate chaging the pathname###
 @app.callback(Output('page-content', 'children'), [Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/All-time':
@@ -103,7 +114,7 @@ def display_page(pathname):
         return start_layout
 
 
-###All_time###
+###All time stats, plotly option for multiple stats and teams + layout###
 All_time_layout = html.Div(
     style={'backgroundColor': '#3F1052'},
     children=[
@@ -116,6 +127,7 @@ All_time_layout = html.Div(
     ]
 )
 
+### Changes figure if a different/new team or stat is selected ### 
 @app.callback(
     Output('all-time-graph-content', 'figure'),
     Input('team-selection', 'value'),
@@ -138,8 +150,9 @@ def update_graph(teams, selected_stats):
                 x=dff['Year'],
                 y=dff[stat],
                 mode='lines+markers',
-                name=f'{team}',
-                line=dict(color=STAT_COLOR.get(team, 'grey'))
+                name=f'{team}, {stat}',
+                line=dict(color=STAT_COLOR.get(team, 'grey')),
+                hovertemplate = f'Team: {team}<br>Statistic: {stat}<br>Year: %{{x}}<br>Value: %{{y}}'
 
             )
             data.append(trace)
