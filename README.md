@@ -1,4 +1,4 @@
-# Premier_leauge_stats
+# Premier leauge stats
 Statistics of the premier leauge since 2000
 All_time stats, Season_stats, Averages, and Topscorers.
 
