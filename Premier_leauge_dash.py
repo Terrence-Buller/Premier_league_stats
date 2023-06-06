@@ -51,6 +51,9 @@ available_stats = ['Pos', 'Wins', 'Draw', 'Loss', 'Goals_for', 'Goals_against', 
 ### Checks for all possible teams in the dataframe and removes duplicates ###
 team_options = [{'label': team, 'value': team} for team in sorted(df.Team.unique())]
 
+### Adding add all button for Averages ###
+team_options_all = [{'label': 'All', 'value': 'all'}] + team_options
+
 ###Layout of the main page logo, header with the title and for links to click and navigate to###
 start_layout = html.Div(
     [
@@ -99,7 +102,7 @@ start_layout = html.Div(
     style={'backgroundImage': 'linear-gradient(to bottom, #0070B5, #DBFCFF)', 'padding': '300px'}
 )
 
-###Callback to navigate chaging the pathname###
+###Callback to navigate chaging the path name###
 @app.callback(Output('page-content', 'children'), [Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/All-time':
@@ -137,7 +140,7 @@ All_time_layout = html.Div(
 def update_graph(teams, selected_stats):
     if selected_stats is None or teams is None:
         return {}
-
+    ### Making sure it is a list so one or multiple teams can be selected ###
     if not isinstance(teams, list):
         teams = [teams]
 
@@ -152,7 +155,7 @@ def update_graph(teams, selected_stats):
                 mode='lines+markers',
                 name=f'{team}, {stat}',
                 line=dict(color=STAT_COLOR.get(team, 'grey')),
-                hovertemplate = f'Team: {team}<br>Statistic: {stat}<br>Year: %{{x}}<br>Value: %{{y}}'
+                hovertemplate = f'Team: {team}<br>Statistic: {stat}<br>Year: %{{x}}<br>Value: %{{y}}' + '<extra></extra>'
 
             )
             data.append(trace)
@@ -170,7 +173,7 @@ def update_graph(teams, selected_stats):
     return fig
 
 
-###season_stats####
+###season stats plotly select a season + stat recieve season table + bar graph of position in stat ###
 season_stats_layout = html.Div(
     style={'backgroundColor': '#3F1052'},
     children=[
@@ -235,7 +238,8 @@ def update_graph_season(years, selected_stat):
             x=team_names,
             y=stat_values,
             name=f'{year} - {selected_stat}',
-            marker=dict(color=[STAT_COLOR.get(team, 'black') for team in team_names])
+            marker=dict(color=[STAT_COLOR.get(team, 'black') for team in team_names]),
+            hovertemplate=f'Team: %{{x}}:<br>Year: {year}<br>{selected_stat}: %{{y}}' + '<extra></extra>'
          )
         data.append(trace)
 
@@ -252,13 +256,13 @@ def update_graph_season(years, selected_stat):
     return fig
 
 
-###Averages_layout###
+###Averages since 2000, plotly option for a stat and multiple or all teams + layout###
 averages_layout = html.Div(
     style={'backgroundColor': '#3F1052'},
     children=[
     html.H2('Averages', style={'textAlign': 'center', 'color': 'white', 'padding': '5px'}),
-    dcc.Dropdown(options=team_options, id='team-selection-avg', multi=True, style={'textAlign': 'center'}),
-    dcc.Dropdown(options=[{'label': stat, 'value': stat} for stat in available_stats], id='stat-selection-avg', multi=True, style={'textAlign': 'center'}),
+    dcc.Dropdown(options=team_options_all, id='team-selection-avg', multi=True, style={'textAlign': 'center'}),
+    dcc.Dropdown(options=[{'label': stat, 'value': stat} for stat in available_stats], id='stat-selection-avg', style={'textAlign': 'center'}),
     dcc.Graph(id='graph-content-avg')
 ])
 
@@ -271,9 +275,12 @@ averages_layout = html.Div(
 def update_graph_avg(teams, selected_stats):
     if selected_stats is None or teams is None:
         return {}
-
-    if not isinstance(teams, list):
-        teams = [teams]
+    ### treated as a list although it's just 1 value ###
+    if not isinstance(selected_stats, list):
+        selected_stats = [selected_stats]
+    
+    if 'all' in teams:
+        teams = [option['value'] for option in team_options]     
 
     data = []
     for team in teams:
@@ -283,10 +290,11 @@ def update_graph_avg(teams, selected_stats):
                 x=[team],
                 y=[team_avg[stat]],
                 name=f'{team} - {stat}',
-                marker=dict(color=STAT_COLOR.get(team, 'black'))
+                marker=dict(color=STAT_COLOR.get(team, 'black')),
+                hovertemplate=f'Team: {team}<br>Statistic: {stat}<br>Average: %{{y}}' + '<extra></extra>'
             )
             data.append(trace)
-    data.sort(key=lambda trace: trace.y[0], reverse=True)
+    data.sort(key=lambda trace: trace.y[0], reverse=not any(stat in ['Pos', 'Goals_against', 'Loss'] for stat in selected_stats))
     layout = go.Layout(title='Team Averages',
                        template='plotly',
                        plot_bgcolor='#3F1052',
@@ -301,7 +309,7 @@ def update_graph_avg(teams, selected_stats):
 
 
 
-###top_scorers###
+### topscorers per season plotly ###
 Scorers = html.Div(
     style={'backgroundColor': '#3F1052'},
     children=[
