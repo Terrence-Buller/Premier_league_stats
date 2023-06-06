@@ -1,6 +1,7 @@
 ### import modules ###
 import pandas as pd
-import mysql.connector
+from sqlalchemy import create_engine
+from urllib.parse import quote_plus
 import dash
 import plotly.graph_objs as go
 from dash import dcc, html, dash_table
@@ -26,21 +27,17 @@ STAT_COLOR = {
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 
 ### Connecting to Mysql database  ###
-mydb = mysql.connector.connect(
-    host="***",
-    user="***",
-    password="***",
-    database="***"
-)
+password = quote_plus("*****")
+engine = create_engine(f"mysql+mysqlconnector://*****:{password}@localhost:****/****")
 
 ### Query for the team results since 2000 and removing (C), (R)###
 query = "SELECT * FROM 2000_now ORDER BY Year ASC"
-df = pd.read_sql(query, mydb)
+df = pd.read_sql(query, engine)
 df['Team'] = df['Team'].str.replace('\(C\)$|\(R\)$', '', regex=True).str.strip()
 
 ### Query for the Topscorer stats in a different Table ###
 query2 = "SELECT * FROM topscorer ORDER BY Year ASC"
-df2 = pd.read_sql(query2, mydb)
+df2 = pd.read_sql(query2, engine)
 
 ### Removing duplicates ###
 selected_year = df.Year.unique()
