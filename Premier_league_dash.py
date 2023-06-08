@@ -55,7 +55,7 @@ team_options_all = [{'label': 'All', 'value': 'all'}] + team_options
 start_layout = html.Div(
     [
         html.Img(
-            src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOJh8vsVmfAqtADNZycxbT0RjmKIr4nhX_XQ&usqp=CAU',
+            src='https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Flag_of_Great_Britain_%281707%E2%80%931800%29.svg/1024px-Flag_of_Great_Britain_%281707%E2%80%931800%29.svg.png',
             alt='Premier League Logo',
             style={'width': '200px', 'margin': '0 auto', 'display': 'block'}
         ),
