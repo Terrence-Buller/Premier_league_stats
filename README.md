@@ -1,6 +1,7 @@
 # Premier leauge stats
 Statistics of the premier leauge since 2000
 All_time stats, Season_stats, Averages, and Topscorers.
+Pictures of the end result in the examples folder.
 
 The 2 scrapers are for all data used in 2 different tables.
 After that if the correct table names are used in the dash program everything should work without any error.
