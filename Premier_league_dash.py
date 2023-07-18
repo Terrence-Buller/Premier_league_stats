@@ -68,31 +68,30 @@ start_layout = html.Div(
                 dcc.Link(
                     'All-time',
                     href='/All-time',
-                    style={'margin': '100px', 'color': 'white', 'backgroundColor': '#3F1052',
+                    style={'margin': '50px', 'color': 'white', 'backgroundColor': '#3F1052',
                            'textDecoration': 'underline', 'padding': '15px'}
                 ),
                 dcc.Link(
                     'Season Stats',
                     href='/Season-stats',
-                    style={'margin': '100px', 'color': 'white', 'backgroundColor': '#3F1052',
+                    style={'margin': '50px', 'color': 'white', 'backgroundColor': '#3F1052',
                            'textDecoration': 'underline',
                            'padding': '15px'}
                 ),
                 dcc.Link(
                     'Averages',
                     href='/Averages',
-                    style={'margin': '100px', 'color': 'white', 'backgroundColor': '#3F1052',
+                    style={'margin': '50px', 'color': 'white', 'backgroundColor': '#3F1052',
                            'textDecoration': 'underline', 'padding': '15px'}
                 ),
                 dcc.Link(
                     'Scorers',
                     href='/Scorers',
-                    style={'margin': '100px', 'color': 'white', 'backgroundColor': '#3F1052',
+                    style={'margin': '50px', 'color': 'white', 'backgroundColor': '#3F1052',
                            'textDecoration': 'underline', 'padding': '15px'}
                 ),
-
             ],
-            style={'textAlign': 'center'}
+            style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}
         )
 
     ],
